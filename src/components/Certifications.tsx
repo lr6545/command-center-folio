@@ -1,5 +1,4 @@
 import { motion } from "framer-motion";
-import { GlassCard } from "./GlassCard";
 import { Award, ExternalLink } from "lucide-react";
 
 const certifications = [
@@ -7,54 +6,54 @@ const certifications = [
     name: "AWS Solutions Architect",
     level: "Associate",
     provider: "Amazon Web Services",
-    color: "primary",
+    color: "primary" as const,
     year: "2023",
   },
   {
     name: "Azure Solutions Architect",
     level: "Expert",
     provider: "Microsoft",
-    color: "secondary",
+    color: "secondary" as const,
     year: "2024",
   },
   {
     name: "Certified Kubernetes Admin",
     level: "CKA",
     provider: "CNCF",
-    color: "success",
+    color: "success" as const,
     year: "2023",
   },
   {
     name: "HashiCorp Terraform",
     level: "Associate",
     provider: "HashiCorp",
-    color: "primary",
+    color: "primary" as const,
     year: "2024",
   },
 ];
 
-export const Certifications = () => {
-  const colorClasses = {
-    primary: {
-      border: "border-primary/50",
-      bg: "bg-primary/10",
-      text: "text-primary",
-      glow: "group-hover:shadow-[0_0_40px_rgba(255,153,0,0.2)]",
-    },
-    secondary: {
-      border: "border-secondary/50",
-      bg: "bg-secondary/10",
-      text: "text-secondary",
-      glow: "group-hover:shadow-[0_0_40px_rgba(0,120,212,0.2)]",
-    },
-    success: {
-      border: "border-success/50",
-      bg: "bg-success/10",
-      text: "text-success",
-      glow: "group-hover:shadow-[0_0_40px_rgba(34,197,94,0.2)]",
-    },
-  };
+const colorMap = {
+  primary: {
+    border: "border-primary/50",
+    bg: "bg-primary/10",
+    text: "text-primary",
+    glow: "hover:shadow-[0_0_40px_rgba(255,153,0,0.2)]",
+  },
+  secondary: {
+    border: "border-secondary/50",
+    bg: "bg-secondary/10",
+    text: "text-secondary",
+    glow: "hover:shadow-[0_0_40px_rgba(0,120,212,0.2)]",
+  },
+  success: {
+    border: "border-success/50",
+    bg: "bg-success/10",
+    text: "text-success",
+    glow: "hover:shadow-[0_0_40px_rgba(34,197,94,0.2)]",
+  },
+};
 
+export const Certifications = () => {
   return (
     <section className="py-24 relative overflow-hidden">
       {/* Background Effect */}
@@ -66,6 +65,7 @@ export const Certifications = () => {
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
+          transition={{ duration: 0.5 }}
           className="text-center mb-16"
         >
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-secondary/10 border border-secondary/20 mb-4">
@@ -83,32 +83,23 @@ export const Certifications = () => {
         {/* Certifications Grid */}
         <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
           {certifications.map((cert, index) => {
-            const colors = colorClasses[cert.color as keyof typeof colorClasses];
+            const colors = colorMap[cert.color];
             
             return (
               <motion.div
                 key={cert.name}
-                initial={{ opacity: 0, scale: 0.9 }}
-                whileInView={{ opacity: 1, scale: 1 }}
-                viewport={{ once: true }}
-                transition={{ delay: index * 0.1 }}
+                initial={{ opacity: 0, y: 20, scale: 0.95 }}
+                whileInView={{ opacity: 1, y: 0, scale: 1 }}
+                viewport={{ once: true, margin: "-30px" }}
+                transition={{ duration: 0.5, delay: index * 0.1 }}
                 className="group"
               >
                 <div 
-                  className={`
-                    glass-panel p-6 h-full flex flex-col items-center text-center
-                    border-2 ${colors.border} ${colors.glow}
-                    transition-all duration-500 cursor-pointer
-                    hover:border-opacity-100
-                  `}
+                  className={`relative glass-panel p-6 h-full flex flex-col items-center text-center border-2 ${colors.border} ${colors.glow} transition-all duration-500 cursor-pointer hover:border-opacity-100`}
                 >
                   {/* Badge Icon */}
                   <motion.div
-                    className={`
-                      w-20 h-20 rounded-2xl ${colors.bg} 
-                      flex items-center justify-center mb-4
-                      group-hover:scale-110 transition-transform duration-300
-                    `}
+                    className={`w-20 h-20 rounded-2xl ${colors.bg} flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300`}
                     whileHover={{ rotate: [0, -5, 5, 0] }}
                     transition={{ duration: 0.5 }}
                   >
@@ -128,11 +119,9 @@ export const Certifications = () => {
                   </span>
 
                   {/* Hover Action */}
-                  <motion.div
-                    className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity"
-                  >
+                  <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                     <ExternalLink className={`w-4 h-4 ${colors.text}`} />
-                  </motion.div>
+                  </div>
                 </div>
               </motion.div>
             );
