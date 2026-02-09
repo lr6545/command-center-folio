@@ -1,5 +1,5 @@
-import { motion } from "framer-motion";
-import { useState, useEffect } from "react";
+import { motion, useInView } from "framer-motion";
+import { useState, useEffect, useRef } from "react";
 import { Terminal, Linkedin, Mail, FileText, Github } from "lucide-react";
 
 const commands = [
@@ -12,9 +12,13 @@ const commands = [
 export const TerminalContact = () => {
   const [displayedText, setDisplayedText] = useState("");
   const [cursorVisible, setCursorVisible] = useState(true);
+  const [showCommands, setShowCommands] = useState(false);
   const promptText = "$ run connect";
+  const sectionRef = useRef(null);
+  const isInView = useInView(sectionRef, { once: true, margin: "-100px" });
 
   useEffect(() => {
+    if (!isInView) return;
     let index = 0;
     const typeInterval = setInterval(() => {
       if (index <= promptText.length) {
@@ -22,28 +26,28 @@ export const TerminalContact = () => {
         index++;
       } else {
         clearInterval(typeInterval);
+        setShowCommands(true);
       }
-    }, 100);
-
+    }, 80);
     return () => clearInterval(typeInterval);
-  }, []);
+  }, [isInView]);
 
   useEffect(() => {
     const cursorInterval = setInterval(() => {
       setCursorVisible((v) => !v);
-    }, 500);
-
+    }, 530);
     return () => clearInterval(cursorInterval);
   }, []);
 
   return (
-    <section className="py-24 relative">
+    <section className="py-24 relative" ref={sectionRef}>
       <div className="container px-4">
         {/* Section Header */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
+          transition={{ duration: 0.5 }}
           className="text-center mb-16"
         >
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-success/10 border border-success/20 mb-4">
@@ -63,6 +67,7 @@ export const TerminalContact = () => {
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
+          transition={{ duration: 0.6 }}
           className="max-w-2xl mx-auto"
         >
           <div className="glass-panel overflow-hidden">
@@ -84,54 +89,56 @@ export const TerminalContact = () => {
               <div className="text-success mb-6 text-lg">
                 {displayedText}
                 <span 
-                  className={`inline-block w-2.5 h-5 bg-success ml-1 ${
+                  className={`inline-block w-2.5 h-5 bg-success ml-1 align-middle ${
                     cursorVisible ? "opacity-100" : "opacity-0"
-                  } transition-opacity duration-100`}
+                  }`}
+                  style={{ transition: "opacity 0.1s" }}
                 />
               </div>
 
               {/* Command Outputs */}
-              <div className="space-y-3">
-                <p className="text-muted-foreground text-sm mb-4">
-                  Available connections:
-                </p>
-                
-                {commands.map((command, index) => (
-                  <motion.a
-                    key={command.label}
-                    href={command.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    initial={{ opacity: 0, x: -20 }}
-                    whileInView={{ opacity: 1, x: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ delay: 0.5 + index * 0.1 }}
-                    className="
-                      group flex items-center gap-3 p-3 rounded-lg
-                      bg-muted/30 hover:bg-muted/50 border border-transparent
-                      hover:border-success/30 transition-all duration-300
-                      cursor-pointer
-                    "
+              {showCommands && (
+                <div className="space-y-3">
+                  <motion.p 
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    className="text-muted-foreground text-sm mb-4"
                   >
-                    <span className="text-primary">{command.cmd}</span>
-                    <span className="text-success group-hover:text-success/80">
-                      {command.label}
-                    </span>
-                    <command.icon className="w-4 h-4 text-muted-foreground group-hover:text-success ml-auto transition-colors" />
-                  </motion.a>
-                ))}
-              </div>
+                    Available connections:
+                  </motion.p>
+                  
+                  {commands.map((command, index) => (
+                    <motion.a
+                      key={command.label}
+                      href={command.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      initial={{ opacity: 0, x: -20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: index * 0.1, duration: 0.3 }}
+                      className="group flex items-center gap-3 p-3 rounded-lg bg-muted/30 hover:bg-muted/50 border border-transparent hover:border-success/30 transition-all duration-300 cursor-pointer"
+                    >
+                      <span className="text-primary">{command.cmd}</span>
+                      <span className="text-success group-hover:text-success/80">
+                        {command.label}
+                      </span>
+                      <command.icon className="w-4 h-4 text-muted-foreground group-hover:text-success ml-auto transition-colors" />
+                    </motion.a>
+                  ))}
+                </div>
+              )}
 
               {/* Status Line */}
-              <motion.div
-                initial={{ opacity: 0 }}
-                whileInView={{ opacity: 1 }}
-                viewport={{ once: true }}
-                transition={{ delay: 1 }}
-                className="mt-6 pt-4 border-t border-border text-sm text-muted-foreground"
-              >
-                <span className="text-success">✓</span> Ready to accept connections
-              </motion.div>
+              {showCommands && (
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 0.5 }}
+                  className="mt-6 pt-4 border-t border-border text-sm text-muted-foreground"
+                >
+                  <span className="text-success">✓</span> Ready to accept connections
+                </motion.div>
+              )}
             </div>
           </div>
         </motion.div>
